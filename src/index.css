@@ -19,6 +19,13 @@ code {
   text-align: center;
 }
 
+.body {
+  color: black;
+  padding: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
 .button-container {
   display: flex;
   flex-wrap: wrap;
