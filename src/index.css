@@ -11,3 +11,43 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.header {
+  background-color: #282c34;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+  padding: 20px;
+  min-height: 50vh;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+.button {
+  background-color: #33daff;
+  color: white; 
+  height: 50px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  flex: 1 1 50px;
+  width: 100%;
+  max-width: 100%;
+  text-align: center; 
+  transition: background-color 0.3s ease;
+  font-size: 1.5rem;
+  height: 50px;
+}
+
+.button:hover {
+  background-color: #29b3d4;
+}
