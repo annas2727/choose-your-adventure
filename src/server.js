@@ -6,7 +6,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const API_KEY = "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";
+require('dotenv').config();
+const API_KEY = process.env.HF_API_KEY;
 
 app.post('/generate', async (req, res) => {
     const prompt = req.body.prompt;
