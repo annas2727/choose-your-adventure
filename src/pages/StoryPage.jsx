@@ -2,6 +2,7 @@ import { useLocation, useNavigate} from 'react-router-dom';
 import Button from './Button.jsx';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import restartIcon from '../assets/restart.png';
 
 function StoryPage() {
     const location = useLocation();
@@ -46,6 +47,9 @@ function StoryPage() {
         <div>
             <div className= "header">
                 <h1>Choose Your Adventure</h1>
+                <button className = "restart-button" onClick={() => navigate('/')}>
+                    <img src={restartIcon} alt="Restart" className="restart-icon" />
+                </button>
             </div>
             <div className = "body">
                 <p>{story}</p>
