@@ -1,35 +1,48 @@
-const express = require('express');
-const axios = require('axios'); // used for making HTTP requests
-const cors = require('cors'); // used for enabling CORS
+// server.js
+
+import express from "express";
+import cors from "cors";
+import { pipeline } from "@xenova/transformers";
 
 const app = express();
+const PORT = 3001;
+
 app.use(cors());
 app.use(express.json());
 
-require('dotenv').config();
-const API_KEY = process.env.HF_API_KEY;
+let pipe;
 
-app.post('/generate', async (req, res) => {
-    const prompt = req.body.prompt;
+// Load the model once at startup
+(async () => {
+  console.log("⏳ Loading model...");
+  pipe = await pipeline("text2text-generation", "Xenova/flan-t5-base");
+  console.log("✅ Model loaded.");
+})();
 
-    try {
-    const response = await axios.post(
-        "https://api-inference.huggingface.co/models/google/flan-t5-base"
-,
-        { inputs: prompt },
-        {
-            headers: {
-                Authorization: `Bearer ${API_KEY}`,
-            },
-        }
-    );
-    res.json(response.data); 
-    } catch (error) {
-        console.error('Error generating response:', error);
-        res.status(500).json({ error: 'Failed to generate response' });
+// Text generation endpoint
+app.post("/generate", async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: "Missing prompt in request body." });
+  }
+
+  console.log("📝 Received prompt:", prompt);
+
+  try {
+    if (!pipe) {
+      return res.status(503).json({ error: "Model is still loading. Try again soon." });
     }
+
+    const result = await pipe(prompt, { max_new_tokens: 100 });
+    const generated = result[0]?.generated_text || "No story generated.";
+    res.json([{ generated_text: generated }]);
+  } catch (error) {
+    console.error("❌ Error generating response:", error);
+    res.status(500).json({ error: "Failed to generate response locally." });
+  }
 });
 
-app.listen(3001, () => {
-    console.log('Server is running on http://localhost:3001');
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
