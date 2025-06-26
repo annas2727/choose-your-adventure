@@ -11,6 +11,8 @@ function StoryPage() {
     const [genre, setGenre] = useState(null);
     const [story, setStory] = useState("Loading story...");
     const [options, setOptions] = useState([]);
+    const [title, setTitle] = useState(null);
+
 
     useEffect(() => {
         const genreFromState = location.state?.genre;
@@ -25,8 +27,11 @@ function StoryPage() {
     useEffect(() => {
         if (!genre) return;
 
-       const prompt = `You are a fantasy writer. Begin a choose-your-own-adventure story. 
-Start with a vivid paragraph that sets the scene, introduces a character, and hints at a choice the reader must make.`;
+       const prompt = `You are a ${genre} writer. Begin a choose-your-own-adventure story. 
+Start with a vivid paragraph that sets the scene, introduces a character, and hints at a choice the
+reader must make. Format the response as follows:
+
+[Title] | [Story Introduction] | [Option] | [Option] |`;
 
         
         axios
@@ -34,10 +39,12 @@ Start with a vivid paragraph that sets the scene, introduces a character, and hi
             .then(res => {
 
                 console.log("API response:", res.data);
-                const text = res.data[0]?.generated_text || "No story generated.";
-                setStory(text);
-                setOptions(["Option 1", "Option 2"]); //fix
-
+                const text = res.data[0]?.story || "No story generated.";
+                
+                const parts = text.split('|');        
+                setTitle(parts[0]);
+                setStory(parts[1]);
+                setOptions([parts[2], parts[3]])
             })
             .catch((err) => {
                 console.error("API error:", err);
@@ -54,6 +61,7 @@ Start with a vivid paragraph that sets the scene, introduces a character, and hi
                 </button>
             </div>
             <div className = "body">
+                <h3>{title} {genre}</h3>
                 <p>{story}</p>
             </div>
             <div className = "button-container"> 

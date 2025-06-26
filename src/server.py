@@ -27,7 +27,7 @@ def generate():
             {"role": "user", "content": prompt}
         ],
         temperature=0.7,
-        max_tokens=100,
+        max_tokens=250
       )
       
       story = response.choices[0].message.content
