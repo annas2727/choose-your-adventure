@@ -1,22 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import requests
 import os
+import openai
 from dotenv import load_dotenv
 
 load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
 
-HF_API_KEY = os.getenv("HF_API_KEY")
-HF_MODEL_ENDPOINT = "https://api-inference.huggingface.co/models/gpt2"
-#"https://api-inference.huggingface.co/models/TeeZee/DarkForest-20B-v2.0"
-
-headers = {
-  "Authorization": f"Bearer {HF_API_KEY}",
-  "Content-Type": "application/json"
-}
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -26,25 +19,22 @@ def generate():
   if not prompt:
     return jsonify({"error": "No prompt provided"}), 400
   
-  payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_length": 250,
-            "do_sample": True,
-            "top_p": 0.95,
-            "temperature": 0.7
-        }
-  }
-
   try:
-      response = requests.post(HF_MODEL_ENDPOINT, headers=headers, json=payload)
-      response.raise_for_status()
-      result = response.json()
-
-      story = result[0]["generated_text"] if isinstance(result, list) else result.get("generated_text", "No text returned.")
+      response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",  # Cheapest model for chat/story tasks
+        messages=[
+            {"role": "system", "content": "You are a helpful story-writing assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=100,
+      )
+      
+      story = response.choices[0].message.content
+      print ("Generated story:", story)
       return jsonify([{"story": story}])
 
-  except requests.exceptions.RequestException as e:
+  except Exception as e:
       print("Error generating response:", str(e))
       return jsonify({"error": str(e)}), 500
   
