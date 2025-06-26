@@ -31,7 +31,7 @@ def generate():
       )
       
       story = response.choices[0].message.content
-      print ("Generated story:", story)
+      print ("Generated story:", story, "\n")
       return jsonify([{"story": story}])
 
   except Exception as e:

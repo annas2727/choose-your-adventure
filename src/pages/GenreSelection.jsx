@@ -3,7 +3,7 @@ import Button from "./Button.jsx";
 
 
 function GenreSelection() {
-    const genres = ["Fantasy", "Science Fiction", "Mystery", "Romance", "Horror"];
+    const genres = ["Fantasy", "Science Fiction", "Mystery", "Romance", "Horror", ];
     const navigate = useNavigate();
     const handleGenreClick = (genre) => {
         navigate('/story', { state: { genre } });

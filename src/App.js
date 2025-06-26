@@ -11,7 +11,8 @@ function App() {
       <Routes>
         <Route path='/' element={<GenreSelection/>} />
         <Route path='/story' element={<StoryPage/>} />
-      </Routes>    </Router>
+      </Routes>   
+    </Router>
   );
 }
 

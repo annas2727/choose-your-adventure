@@ -1,8 +1,9 @@
 import { useLocation, useNavigate} from 'react-router-dom';
 import Button from './Button.jsx';
-import axios from 'axios';
 import { useState, useEffect } from 'react';
 import restartIcon from '../assets/restart.png';
+import { generateStory } from './Response.jsx';
+
 
 function StoryPage() {
     const location = useLocation();
@@ -12,6 +13,8 @@ function StoryPage() {
     const [story, setStory] = useState("Loading story...");
     const [options, setOptions] = useState([]);
     const [title, setTitle] = useState(null);
+    const [step, setStep] = useState(0);
+    const maxSteps = 2;
 
 
     useEffect(() => {
@@ -26,31 +29,67 @@ function StoryPage() {
 
     useEffect(() => {
         if (!genre) return;
+      const prompt = `You are a skilled ${genre} writer. Begin a choose-your-own-adventure story written in the second-person perspective ("you" are the main character).
 
-       const prompt = `You are a ${genre} writer. Begin a choose-your-own-adventure story. 
-Start with a vivid paragraph that sets the scene, introduces a character, and hints at a choice the
-reader must make. Format the response as follows:
+Requirements:
+- Write a short, compelling title (maximum 5 words). Do NOT include any special characters or brackets in the title.
+- Write a vivid introductory paragraph that sets the scene, introduces the main character (the reader), and leads up to a meaningful choice.
+- Provide exactly two clear and distinct choices the reader must make.
+- Use the pipe symbol '|' to separate each part. Do not include extra pipe characters or place one at the beginning or end.
 
-[Title] | [Story Introduction] | [Option] | [Option] |`;
+Format your response exactly like this:
+Title | Story Introduction | First Choice | Second Choice |
 
+Make sure:
+- The title has no brackets or special characters
+- There are no missing or extra pipe symbols
+- Each option is a full, coherent sentence (less than 15 words) that begins with a verb or action
+`;
+
+
+    generateStory(prompt).then(( {title, story, options }) => {
         
-        axios
-             .post("http://localhost:3001/generate", { prompt })
-            .then(res => {
-
-                console.log("API response:", res.data);
-                const text = res.data[0]?.story || "No story generated.";
-                
-                const parts = text.split('|');        
-                setTitle(parts[0]);
-                setStory(parts[1]);
-                setOptions([parts[2], parts[3]])
-            })
-            .catch((err) => {
-                console.error("API error:", err);
-                setStory("Error loading story.");
-        });
+        setTitle(title);
+        setStory(story);
+        setOptions(options);
+        setStep(1);
+    });
     }, [genre]);
+
+    const handleOptionClick = (option) => {
+        if (step === maxSteps-1) {
+            const endingPrompt = `You are a ${genre} writer. Continue this choose-your-own-adventure story in the second person perspective.
+You will continue from the last paragraph of the story, which is: "${story}" and the user choose "${option}". This is the end of the sotry
+and needs to have a satifying ending and conclusion. It will need to be a complete ending that wraps up the story and does not leave any loose ends.
+Include:
+1. A bolded title in brackets [Title]
+2. A descriptive story paragraph in relation to the user's choice, continuing the narrative but don't include the previous story in your response.
+Do not include extra symbols in the title or options, including []* . The Title, story are separated by | as delimiters on each side, before and after each option but dont have two in a row. 
+The format should be as follows:
+[Title] | [Next paragraph that also relates the story with the user's previously chosen option and concludes the story] `;
+        generateStory(endingPrompt).then(({ story, options }) => {
+        setStory(story);
+        setOptions(options);
+        setStep(prevStep => prevStep + 1);
+    });
+        } else {
+        const newPrompt = `You are a ${genre} writer. Continue this choose-your-own-adventure story in the second person perspective.
+You will continue from the last paragraph of the story, which is: "${story}" and the user choose "${option}".
+Include:
+1. A bolded title in brackets [Title]
+2. A descriptive story paragraph in relation to the user's choice, continuing the narrative but don't include the previous story in your response.
+3. Two options for what the character can do next. Make sure there are two complete options. 
+Do not include extra symbols in the title or options, including []* . The Title, story, and options are separated by | as delimiters on each side, before and after each option but dont have two in a row. 
+The format should be as follows:
+[Title] | [Next paragraph that also relates the story with the user's previously chosen option] | [Option] | [Option] |`;
+    
+    generateStory(newPrompt).then(({ story, options }) => {
+        setStory(story);
+        setOptions(options);
+        setStep(prevStep => prevStep + 1);
+    });
+    }
+};
 
     return (
         <div>
@@ -61,18 +100,25 @@ reader must make. Format the response as follows:
                 </button>
             </div>
             <div className = "body">
-                <h3>{title} {genre}</h3>
+                <h3>{title}</h3>
                 <p>{story}</p>
             </div>
-            <div className = "button-container"> 
-                            {options.map((option) => (
-                            <Button 
-                                key={option} 
-                                label={option}
-                                onClick={() => alert(`You chose: ${option}`)}//handleGenreClick(option)} 
-                            />
-                            ))}
+            <div className="button-container"> 
+            {step <= maxSteps -1 ? (
+                options.map((option, idx) => (
+                <Button 
+                    key={idx} 
+                    label={option}
+                    onClick={() => handleOptionClick(option)} 
+                />
+                ))
+            ) : (
+                <button className="play-again-button" onClick={() => navigate('/')}>
+                Play Again
+                </button>
+            )}
             </div>
+
         </div>
         
     );

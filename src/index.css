@@ -42,7 +42,6 @@ code {
 .button {
   background-color: #33daff;
   color: white; 
-  min-height: 5vh;
   box-sizing: border-box;
   border-radius: 5px;
   border: none;
@@ -53,6 +52,8 @@ code {
   text-align: center; 
   transition: background-color 0.3s ease;
   font-size: 1.5rem;
+  height: max-content !important;
+  padding: 10px 20px;
 }
 
 .button:hover {
@@ -74,4 +75,22 @@ code {
   height: 50px;
   transition: transform 0.3s ease;
   object-fit: contain;
+}
+
+.play-again-button {
+  background-color: rgb(80, 80, 236);
+  color: white;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  flex: 1 1 50px;
+  width: 100%;
+  max-width: 100%;
+  text-align: center; 
+  transition: background-color 0.3s ease;
+  font-size: 1.5rem;
+  height: max-content !important;
+  padding: 20px 20px;
+  font-style: bold;
 }
