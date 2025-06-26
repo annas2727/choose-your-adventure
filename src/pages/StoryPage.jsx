@@ -25,7 +25,15 @@ function StoryPage() {
     useEffect(() => {
         if (!genre) return;
 
-        const prompt = `Write the beginning of a ${genre} adventure story with two possible choices.`;
+        const prompt = `Write the first paragraph of a fantasy choose-your-own-adventure story.
+At the end, include two choices the reader can make.
+Be creative and descriptive.
+Format it like this:
+
+Story: ...
+Choices:
+1. ...
+2. ...`;
         
         axios
              .post("http://localhost:3001/generate", { prompt })
@@ -39,7 +47,7 @@ function StoryPage() {
             })
             .catch((err) => {
                 console.error("API error:", err);
-                setStory("Error loading story." + genre);
+                setStory("Error loading story.");
         });
     }, [genre]);
 
