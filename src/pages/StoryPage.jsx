@@ -25,15 +25,9 @@ function StoryPage() {
     useEffect(() => {
         if (!genre) return;
 
-        const prompt = `Write the first paragraph of a fantasy choose-your-own-adventure story.
-At the end, include two choices the reader can make.
-Be creative and descriptive.
-Format it like this:
+       const prompt = `You are a fantasy writer. Begin a choose-your-own-adventure story. 
+Start with a vivid paragraph that sets the scene, introduces a character, and hints at a choice the reader must make.`;
 
-Story: ...
-Choices:
-1. ...
-2. ...`;
         
         axios
              .post("http://localhost:3001/generate", { prompt })
